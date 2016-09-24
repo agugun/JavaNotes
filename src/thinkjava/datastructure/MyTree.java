@@ -1,4 +1,4 @@
-package thinkjava.datatype;
+package thinkjava.datastructure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,12 @@ public class MyTree<T> {
 		tree.setParent(this);
 		childs.add(tree);
 		return tree;
+	}
+	
+	public MyTree<T> addChild(MyTree<T> node) {
+		if (childs == null) childs = new ArrayList<MyTree<T>>();
+		childs.add(node);
+		return node;
 	}
 	
 	public T getData() {
@@ -64,17 +70,32 @@ public class MyTree<T> {
 		} 
 	}
 	
+	public MyTree<T> show () {
+		if (!isLeaf()) {
+			for (MyTree<T> child : childs) {
+				System.out.println(child.getData());
+				MyTree<T> tree = child.show();
+				if (tree!= null) return tree;
+			}
+		}
+		return null;
+	}
+	
 	public void removeNode(T data) {
 		MyTree<T> tree = findNode(data);
+		
+		int idx = tree.getParent().getChilds().indexOf(tree);
+		tree.getParent().getChilds().remove(tree);
 		for (MyTree<T> myTree : tree.getChilds()) {
 			myTree.setParent(tree.getParent());
+			tree.getParent().getChilds().add(idx++, myTree);
 		}
-		tree.getParent().getChilds().remove(data);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof MyTree) {
+			@SuppressWarnings("unchecked")
 			MyTree<T> newObj = (MyTree<T>) obj;
 			return newObj.getData().equals(data);
 		} else {
@@ -101,8 +122,13 @@ public class MyTree<T> {
 		
 		root.findNode("D3");
 		
+		System.out.println(root.getChilds().size());
 		root.removeNode("B");
+		System.out.println(root.getChilds().size());
 		System.out.println("==============");
-		root.findNode("D3");
+		root.findNode("B3");
+		
+		System.out.println("=================show");
+		root.show();
 	}
 }
